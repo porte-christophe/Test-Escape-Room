@@ -8,4 +8,11 @@ describe("Porte", () =>{
 
 		expect(porte.pass()).toBeFalsy();
 	});
+	it("Une porte ouverte peut être franchie.", () =>{
+		const porte = new Porte();
+		porte.openDoor();
+
+		expect(porte.pass()).toBeTruthy();
+	});
+
 });

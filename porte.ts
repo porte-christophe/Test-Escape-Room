@@ -8,4 +8,8 @@ export class Porte{
 	pass():boolean {
 		return this.isOpen;
 	}
+
+	openDoor():void {
+		this.isOpen = true;
+	}
 }
