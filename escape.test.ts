@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Porte } from "./porte";
 import { Joueur } from "./joueur";
+import { Salle } from "./salle";
 
 
 describe("Porte", () =>{
@@ -48,8 +49,17 @@ describe("Joueur", () =>{
 		j1.addToInventory("key-blue");
 		j1.openDoor(porteRouge);
 		expect(j1.inventory).toStrictEqual(["key-blue"]);
+	});
+});
+
+describe("Salle", () =>{
+	it("Lorsqu'un joueur ramasse un objet, celui-ci est ajouté à son inventaire et retiré de la salle", () =>{
+		const salle = new Salle();
+		const j1 = new Joueur();
+		j1.takeItem(salle, "torch");
 
 
-
-	})
+		expect(j1.inventory).toStrictEqual(["torch"]);
+		expect(salle.items).toStrictEqual(["chest"]);
+	});
 });

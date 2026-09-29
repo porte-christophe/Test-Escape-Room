@@ -1,4 +1,5 @@
 import { Porte } from "./porte";
+import { Salle } from "./salle";
 
 export class Joueur{
 	inventory:array ;
@@ -7,7 +8,7 @@ export class Joueur{
 		this.inventory = [];
 	}
 
-	addToInventory(item:string){
+	addToInventory(item:string):void{
 		this.inventory.push(item);
 	}
 
@@ -15,7 +16,7 @@ export class Joueur{
 		this.inventory.splice(id , 1);
 	}
 
-	openDoor(porte:Porte){
+	openDoor(porte:Porte):boolean{
 		let idItemToRemove = -1;
 		this.inventory.forEach((item, index)=>{
 			if (item === porte.clef) {
@@ -30,5 +31,10 @@ export class Joueur{
 		this.removeFromInventory(idItemToRemove);
 		porte.openDoor();
 		return true;
+	}
+
+	takeItem(salle:Salle, item:string):void{
+		salle.removeFromRoomItems(item);
+		this.addToInventory(item);
 	}
 }
