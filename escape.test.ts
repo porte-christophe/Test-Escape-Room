@@ -24,7 +24,9 @@ describe("Porte", () =>{
 describe("Joueur", () =>{
 	it("le joueur peut ouvrir la porte s'il possède la clé correspondante", () =>{
 		const porteRouge = new Porte("key-red");
-		const j1 = new Joueur("key-red");
+		const j1 = new Joueur();
+		j1.addToInventory("key-red");
+
 
 		expect(j1.openDoor(porteRouge)).toBeTruthy();
 		expect(porteRouge.isOpen).toBeTruthy();
@@ -38,4 +40,16 @@ describe("Joueur", () =>{
 		expect(porteRouge.isOpen).toBeFalsy();
 
 	});
+	it("Lorsqu'une clé est utilisée pour ouvrir une porte, elle est retirée de l'inventaire du joueur.", () =>{
+		const porteRouge = new Porte("key-red");
+		const j1 = new Joueur();
+
+		j1.addToInventory("key-red");
+		j1.addToInventory("key-blue");
+		j1.openDoor(porteRouge);
+		expect(j1.inventory).toStrictEqual(["key-blue"]);
+
+
+
+	})
 });
