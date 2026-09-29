@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Porte } from "./porte";
+import { Joueur } from "./joueur";
 
 
 describe("Porte", () =>{
@@ -18,4 +19,23 @@ describe("Porte", () =>{
 		expect(porteRouge.clef).toBe("key-red");
 	});
 
+});
+
+describe("Joueur", () =>{
+	it("le joueur peut ouvrir la porte s'il possède la clé correspondante", () =>{
+		const porteRouge = new Porte("key-red");
+		const j1 = new Joueur("key-red");
+
+		expect(j1.openDoor(porteRouge)).toBeTruthy();
+		expect(porteRouge.isOpen).toBeTruthy();
+
+	});
+	it("le joueur ne peut pas ouvrir la porte s'il ne possède pas la clé correspondante", () =>{
+		const porteRouge = new Porte("key-red");
+		const j1 = new Joueur();
+
+		expect(j1.openDoor(porteRouge)).toBeFalsy();
+		expect(porteRouge.isOpen).toBeFalsy();
+
+	});
 });
