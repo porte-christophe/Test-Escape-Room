@@ -1,8 +1,10 @@
 export class Porte{
 	isOpen: boolean;
+	clef: string;
 
-	constructor(){
+	constructor(key:string = ""){
 		this.isOpen = false;
+		this.clef = key;
 	}
 
 	pass():boolean {
