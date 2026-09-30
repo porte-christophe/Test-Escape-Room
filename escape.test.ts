@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Porte } from "./porte";
 import { Joueur } from "./joueur";
 import { Salle } from "./salle";
+import { Puzzle } from "./puzzle";
 
 
 describe("Porte", () =>{
@@ -12,8 +13,6 @@ describe("Porte", () =>{
 	it("Une porte ouverte peut être franchie.", () =>{
 		const porte = new Porte();
 		porte.openDoor();
-		porte.puzzle(8);
-
 
 		expect(porte.pass()).toBeTruthy();
 	});
@@ -21,20 +20,6 @@ describe("Porte", () =>{
 		const porteRouge = new Porte("key-red");
 		expect(porteRouge.clef).toBe("key-red");
 	});
-	it("Une porte peut être associée à une énigme.", () =>{
-		const porte = new Porte();
-		porte.openDoor();
-		
-		porte.puzzle(1);
-		expect(porte.pass()).toBeFalsy();
-
-		porte.puzzle(2);
-		expect(porte.pass()).toBeTruthy();
-		expect(porte.pass()).toBeTruthy();
-
-
-	});
-
 });
 
 describe("Joueur", () =>{
@@ -103,3 +88,74 @@ describe("Salle", () =>{
 
 	})
 });
+
+describe("Enigme", () =>{
+	it("Une porte peut être associée à une énigme.", () =>{
+		const puzzle = new Puzzle(8);
+		const porte = new Porte();
+		porte.addPuzzle(puzzle);
+
+		expect(porte.puzzle).toBeDefined();
+	});
+	it("Pour franchir la porte, l’énigme doit avoir été résolue.", () =>{
+		const puzzle = new Puzzle(8);
+		const porte = new Porte();
+		porte.openDoor();
+		porte.addPuzzle(puzzle);
+		puzzle.resolve(8);
+
+		expect(porte.puzzle.isSolved).toBeTruthy();
+		expect(porte.pass()).toBeTruthy();
+	});
+	it("Le joueur doit fournir la bonne réponse pour résoudre l’énigme.", () =>{
+		const puzzle = new Puzzle(8);
+		const porte = new Porte();
+		const j1 = new Joueur();
+		porte.openDoor();
+		porte.addPuzzle(puzzle);
+
+		expect(j1.resolve(porte.puzzle, 8)).toBeTruthy();
+	});
+	it("Une mauvaise réponse ne permet pas de résoudre l’énigme.", () =>{
+		const puzzle = new Puzzle(8);
+		const porte = new Porte();
+		const j1 = new Joueur();
+		porte.openDoor();
+		porte.addPuzzle(puzzle);
+
+		expect(j1.resolve(porte.puzzle, 7)).toBeFalsy();
+		expect(porte.pass()).toBeFalsy();
+	});
+	it("Une fois résolue, l’énigme reste résolue.", () =>{
+		const puzzle = new Puzzle(8);
+		const porte = new Porte();
+		const j1 = new Joueur();
+		porte.openDoor();
+		porte.addPuzzle(puzzle);
+
+		expect(j1.resolve(porte.puzzle, 8)).toBeTruthy();
+		expect(porte.puzzle.isSolved).toBeTruthy();
+	});
+	// it("Gerer le Nombre d'essai d'une énigme", () =>{
+	// 	const porte = new Porte();
+	// 	porte.openDoor();
+		
+	// 	porte.puzzle(1);
+	// 	expect(porte.puzzleTry).toBe(1);
+	// 	porte.puzzle(3);
+	// 	expect(porte.puzzleTry).toBe(2);
+	// 	expect(porte.puzzle(7)).toStrictEqual({isSolved:false, error:"plus de trois essai"})
+	// 	expect(porte.puzzleTry).toBe(3);
+	// });
+	// it("Résolution unique", () =>{
+	// 	const porte = new Porte();
+	// 	porte.openDoor();
+		
+		
+	// 	expect(porte.puzzle(2)).toStrictEqual({isSolved:true, error:""});
+	// 	expect(porte.puzzle(2)).toStrictEqual({isSolved:true, error:"Déjà résolue"});
+	// 	expect(porte.pass()).toBeTruthy();
+
+
+	// });
+})

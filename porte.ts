@@ -1,28 +1,29 @@
+import { Puzzle } from "./puzzle";
+
 export class Porte{
 	isOpen: boolean;
 	clef: string;
-	isSolved: boolean;
+	puzzle: Puzzle;
 
 	constructor(key:string = ""){
 		this.isOpen = false;
 		this.clef = key;
-		this.isSolved = false;
+	}
+
+	addPuzzle(puzzle:Puzzle){
+		this.puzzle = puzzle;
 	}
 
 	pass():boolean {
-		return this.isOpen && this.isSolved;
+		if(this.puzzle === undefined){
+			return this.isOpen;
+		}
+		return this.isOpen && this.puzzle.isSolved;
 	}
 
 	openDoor():void {
 		this.isOpen = true;
 	}
 
-	puzzle(num:number):boolean {
-		if (num%2 !== 0) {
-			this.isSolved = false;
-			return this.isSolved;
-		}
-		this.isSolved = true;
-		return this.isSolved;
-	}
+	
 }

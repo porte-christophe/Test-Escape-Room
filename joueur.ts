@@ -48,4 +48,8 @@ export class Joueur{
 		}
 		return true;
 	}
+
+	resolve(puzzle:Puzzle, res:number):boolean {
+		return puzzle.resolve(res);
+	}
 }
