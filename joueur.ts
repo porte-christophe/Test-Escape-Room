@@ -33,8 +33,12 @@ export class Joueur{
 		return true;
 	}
 
-	takeItem(salle:Salle, item:string):void{
+	takeItem(salle:Salle, item:string):boolean{
+		if (this.inventory.includes(item)) {
+			return false
+		}
 		salle.removeFromRoomItems(item);
 		this.addToInventory(item);
+		return true
 	}
 }

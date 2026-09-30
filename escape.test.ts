@@ -62,4 +62,13 @@ describe("Salle", () =>{
 		expect(j1.inventory).toStrictEqual(["torch"]);
 		expect(salle.items).toStrictEqual(["chest"]);
 	});
+	it("Un objet déjà ramassé ne peut pas être ramassé une seconde fois.", () =>{
+		const salle = new Salle();
+		const j1 = new Joueur();
+		j1.takeItem(salle, "torch");
+
+		expect(j1.takeItem(salle, "torch")).toBeFalsy();
+		expect(j1.inventory).toStrictEqual(["torch"]);
+		expect(salle.items).toStrictEqual(["chest"]);
+	})
 });
