@@ -34,11 +34,18 @@ export class Joueur{
 	}
 
 	takeItem(salle:Salle, item:string):boolean{
-		if (this.inventory.includes(item)) {
-			return false
+		if (this.inventory.includes(item) || !salle.items.includes(item)) {
+			return false;
 		}
 		salle.removeFromRoomItems(item);
 		this.addToInventory(item);
-		return true
+		return true;
+	}
+
+	useItem(item:string):boolean{
+		if (!this.inventory.includes(item)) {
+			return false;
+		}
+		return true;
 	}
 }

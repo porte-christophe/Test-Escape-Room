@@ -50,6 +50,14 @@ describe("Joueur", () =>{
 		j1.openDoor(porteRouge);
 		expect(j1.inventory).toStrictEqual(["key-blue"]);
 	});
+	it("Un joueur ne peut utiliser qu'un objet qu'il possède dans son inventaire.", () =>{
+		const j1 = new Joueur();
+
+		j1.addToInventory("key-red");
+		expect(j1.useItem("key-red")).toBeTruthy();
+		expect(j1.useItem("key-blue")).toBeFalsy();
+
+	})
 });
 
 describe("Salle", () =>{
@@ -70,5 +78,13 @@ describe("Salle", () =>{
 		expect(j1.takeItem(salle, "torch")).toBeFalsy();
 		expect(j1.inventory).toStrictEqual(["torch"]);
 		expect(salle.items).toStrictEqual(["chest"]);
+	});
+	it("Un joueur ne peut utiliser qu'un objet qu'il possède dans son inventaire.", () =>{
+		const j1 = new Joueur();
+
+		j1.addToInventory("key-red");
+		expect(j1.useItem("key-red")).toBeTruthy();
+		expect(j1.useItem("key-blue")).toBeFalsy();
+
 	})
 });
