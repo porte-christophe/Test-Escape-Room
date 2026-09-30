@@ -12,18 +12,33 @@ describe("Porte", () =>{
 	it("Une porte ouverte peut être franchie.", () =>{
 		const porte = new Porte();
 		porte.openDoor();
+		porte.puzzle(8);
+
 
 		expect(porte.pass()).toBeTruthy();
 	});
-	it("chaque porte peut nécessiter une clé particulière", () =>{
+	it("Chaque porte peut nécessiter une clé particulière", () =>{
 		const porteRouge = new Porte("key-red");
 		expect(porteRouge.clef).toBe("key-red");
+	});
+	it("Une porte peut être associée à une énigme.", () =>{
+		const porte = new Porte();
+		porte.openDoor();
+		
+		porte.puzzle(1);
+		expect(porte.pass()).toBeFalsy();
+
+		porte.puzzle(2);
+		expect(porte.pass()).toBeTruthy();
+		expect(porte.pass()).toBeTruthy();
+
+
 	});
 
 });
 
 describe("Joueur", () =>{
-	it("le joueur peut ouvrir la porte s'il possède la clé correspondante", () =>{
+	it("Le joueur peut ouvrir la porte s'il possède la clé correspondante", () =>{
 		const porteRouge = new Porte("key-red");
 		const j1 = new Joueur();
 		j1.addToInventory("key-red");
@@ -33,7 +48,7 @@ describe("Joueur", () =>{
 		expect(porteRouge.isOpen).toBeTruthy();
 
 	});
-	it("le joueur ne peut pas ouvrir la porte s'il ne possède pas la clé correspondante", () =>{
+	it("Le joueur ne peut pas ouvrir la porte s'il ne possède pas la clé correspondante", () =>{
 		const porteRouge = new Porte("key-red");
 		const j1 = new Joueur();
 
