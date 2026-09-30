@@ -136,17 +136,41 @@ describe("Enigme", () =>{
 		expect(j1.resolve(porte.puzzle, 8)).toBeTruthy();
 		expect(porte.puzzle.isSolved).toBeTruthy();
 	});
-	// it("Gerer le Nombre d'essai d'une énigme", () =>{
-	// 	const porte = new Porte();
-	// 	porte.openDoor();
+	it("Chaque mauvaise réponse augmente le nombre de tentatives échouées.", () =>{
+		const puzzle = new Puzzle(8);
+
+		puzzle.resolve(1);
 		
-	// 	porte.puzzle(1);
-	// 	expect(porte.puzzleTry).toBe(1);
-	// 	porte.puzzle(3);
-	// 	expect(porte.puzzleTry).toBe(2);
-	// 	expect(porte.puzzle(7)).toStrictEqual({isSolved:false, error:"plus de trois essai"})
-	// 	expect(porte.puzzleTry).toBe(3);
-	// });
+		expect(puzzle.failedTry).toBe(1);
+	});
+	it("Après 3 mauvaises réponses, une conséquence doit être déclenchée.", () =>{
+		const puzzle = new Puzzle(8);
+
+		puzzle.resolve(1);
+		puzzle.resolve(1);
+		expect(puzzle.tryStat).toBeTruthy();
+		puzzle.resolve(1);
+
+		expect(puzzle.tryStat).toBeFalsy();
+
+	});
+	it("Une bonne réponse permet toujours de résoudre l’énigme.", () =>{
+		const puzzle = new Puzzle(8);
+
+		puzzle.resolve(8);
+		expect(puzzle.isSolved).toBeTruthy();
+	});
+	it("Une énigme déjà résolue ne peut pas être résolue une seconde fois.", () =>{
+		const puzzle = new Puzzle(8);
+
+		expect(puzzle.resolve(8)).toBeTruthy();
+		expect(puzzle.isSolved).toBeTruthy();
+		expect(puzzle.resolve(8)).toBeFalsy();
+	});
+
+
+
+	//	expect(porte.puzzle(7)).toStrictEqual({isSolved:false, error:"plus de trois essai"})
 	// it("Résolution unique", () =>{
 	// 	const porte = new Porte();
 	// 	porte.openDoor();
