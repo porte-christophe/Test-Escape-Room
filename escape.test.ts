@@ -167,19 +167,4 @@ describe("Enigme", () =>{
 		expect(puzzle.isSolved).toBeTruthy();
 		expect(puzzle.resolve(8)).toBeFalsy();
 	});
-
-
-
-	//	expect(porte.puzzle(7)).toStrictEqual({isSolved:false, error:"plus de trois essai"})
-	// it("Résolution unique", () =>{
-	// 	const porte = new Porte();
-	// 	porte.openDoor();
-		
-		
-	// 	expect(porte.puzzle(2)).toStrictEqual({isSolved:true, error:""});
-	// 	expect(porte.puzzle(2)).toStrictEqual({isSolved:true, error:"Déjà résolue"});
-	// 	expect(porte.pass()).toBeTruthy();
-
-
-	// });
 })

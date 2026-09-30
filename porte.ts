@@ -10,7 +10,7 @@ export class Porte{
 		this.clef = key;
 	}
 
-	addPuzzle(puzzle:Puzzle){
+	addPuzzle(puzzle:Puzzle):void{
 		this.puzzle = puzzle;
 	}
 
