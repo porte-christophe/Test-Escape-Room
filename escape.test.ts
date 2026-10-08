@@ -3,6 +3,7 @@ import { Porte } from "./porte";
 import { Joueur } from "./joueur";
 import { Salle } from "./salle";
 import { Puzzle } from "./puzzle";
+import { Alarme } from "./alarme";
 
 
 describe("Porte", () =>{
@@ -167,4 +168,41 @@ describe("Enigme", () =>{
 		expect(puzzle.isSolved).toBeTruthy();
 		expect(puzzle.resolve(8)).toBeFalsy();
 	});
+});
+
+describe("Alarme", () =>{
+	it("L’alarme peut être inactive ou active.", () =>{
+		const alert = new Alarme();
+
+		expect(alert.isActive).toBeFalsy();
+	});
+	it("Une action permet d’activer l’alarme.", () =>{
+		const alert = new Alarme();
+
+		alert.setOn();
+
+		expect(alert.isActive).toBeTruthy();
+	});
+	it("Une fois activée, l’alarme reste active jusqu’à sa désactivation.", () =>{
+		const alert = new Alarme();
+
+		alert.setOn();
+
+		expect(alert.isActive).toBeTruthy();
+		expect(alert.isActive).toBeTruthy();
+	});
+	it("Certaines portes ne peuvent pas être franchies lorsque l’alarme est active.", () =>{
+		const alert = new Alarme();
+		const porte = new Porte();
+		porte.openDoor();
+		
+		porte.setAlarme(alert);
+		alert.setOn();
+
+
+
+		expect(porte.alarme.isActive).toBeTruthy();
+		expect(porte.pass()).toBeFalsy();
+	});
+
 })
