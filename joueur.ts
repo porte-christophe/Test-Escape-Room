@@ -1,5 +1,6 @@
 import { Porte } from "./porte";
 import { Salle } from "./salle";
+import { Alarme } from "./alarme";
 
 export class Joueur{
 	inventory:array ;
@@ -51,5 +52,21 @@ export class Joueur{
 
 	resolve(puzzle:Puzzle, res:number):boolean {
 		return puzzle.resolve(res);
+	}
+
+	alarmeOff(alarme:Alarme):boolean {
+		let idItemToRemove = -1;
+		this.inventory.forEach((item, index)=>{
+			if (item === alarme.code) {
+				idItemToRemove = index;
+			}
+
+		})
+		if (idItemToRemove === -1) {
+			return false;
+		}
+		alarme.setOff();
+		this.removeFromInventory(idItemToRemove);
+		return true
 	}
 }

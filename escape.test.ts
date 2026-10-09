@@ -199,10 +199,46 @@ describe("Alarme", () =>{
 		porte.setAlarme(alert);
 		alert.setOn();
 
-
-
 		expect(porte.alarme.isActive).toBeTruthy();
 		expect(porte.pass()).toBeFalsy();
+	});
+	it("Un joueur peut desactiver une alarme avec un code adapter et le code et retiré de l'inventaire.", () =>{
+		const alert = new Alarme();
+		const j1 = new Joueur();
+		j1.addToInventory("alarm-code");//code de l'alarme par default
+
+		alert.setOn();
+		j1.alarmeOff(alert);
+
+		expect(j1.inventory).toStrictEqual([]);
+		expect(alert.isActive).toBeFalsy();
+	});
+	it("Un mauvais code ne désactive pas l’alarme.", () =>{
+		const alert = new Alarme();
+		const j1 = new Joueur();
+		j1.addToInventory("alarme-code");//code erronné
+
+		alert.setOn();
+		j1.alarmeOff(alert);
+
+		expect(j1.inventory).toStrictEqual(["alarme-code"]);
+		expect(alert.isActive).toBeTruthy();
+	});
+	it("Une fois l’alarme désactivée, les portes bloquées par l’alarme peuvent à nouveau être franchies.", () =>{
+		const alert = new Alarme();
+		const porte = new Porte();
+		porte.openDoor();
+		const j1 = new Joueur();
+		j1.addToInventory("alarm-code");//code de l'alarme par default
+
+		porte.setAlarme(alert);
+		alert.setOn();
+
+		expect(porte.pass()).toBeFalsy();
+		j1.alarmeOff(alert);
+		expect(porte.pass()).toBeTruthy();
+
+
 	});
 
 })

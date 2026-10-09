@@ -21,13 +21,9 @@ export class Porte{
 	}
 
 	pass():boolean {
-		if (!this.isOpen) {
-			return this.isOpen;
-		}
 		switch(this.isOpen){
 			case false:
 				return this.isOpen;//false
-				break;
 			case true:
 				if (this.puzzle === undefined || this.puzzle.isSolved) {
 					if (this.alarme === undefined || !this.alarme.isActive) {
