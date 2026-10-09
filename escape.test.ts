@@ -237,8 +237,172 @@ describe("Alarme", () =>{
 		expect(porte.pass()).toBeFalsy();
 		j1.alarmeOff(alert);
 		expect(porte.pass()).toBeTruthy();
-
-
 	});
+});
 
+describe("Porte du labo", () =>{
+	it("aucune condition remplie", () =>{
+		const porteLab = new Porte("cle-labo");
+		const puzzleLab = new Puzzle(7);
+		const alarmeLab = new Alarme();//code par default "alarm-code"
+
+		porteLab.addPuzzle(puzzleLab);
+		porteLab.setAlarme(alarmeLab);
+		alarmeLab.setOn();
+
+
+		expect(porteLab.isOpen).toBeFalsy();
+		expect(porteLab.puzzle.isSolved).toBeFalsy();
+		expect(porteLab.alarme.isActive).toBeTruthy();
+
+		expect(porteLab.pass()).toBeFalsy();//franchissement impossible car aucune condition remplie
+
+		
+	});
+	it("uniquement la clé", () =>{
+		const porteLab = new Porte("cle-labo");
+		const puzzleLab = new Puzzle(7);
+		const alarmeLab = new Alarme();//code par default "alarm-code"
+
+		porteLab.addPuzzle(puzzleLab);
+		porteLab.setAlarme(alarmeLab);
+		alarmeLab.setOn();
+
+		const j1 = new Joueur();
+		j1.addToInventory("cle-labo");
+		j1.openDoor(porteLab);//"ouverte" mais non franchie
+
+
+		expect(porteLab.isOpen).toBeTruthy();
+		expect(porteLab.puzzle.isSolved).toBeFalsy();
+		expect(porteLab.alarme.isActive).toBeTruthy();
+
+		expect(porteLab.pass()).toBeFalsy();//franchissement impossible car alarme active et puzzle non resolus
+	});
+	it("uniquement l’énigme", () =>{
+		const porteLab = new Porte("cle-labo");
+		const puzzleLab = new Puzzle(7);
+		const alarmeLab = new Alarme();//code par default "alarm-code"
+
+		porteLab.addPuzzle(puzzleLab);
+		porteLab.setAlarme(alarmeLab);
+		alarmeLab.setOn();
+
+		const j1 = new Joueur();
+		j1.resolve(puzzleLab, 7);
+
+		expect(porteLab.isOpen).toBeFalsy();
+		expect(porteLab.puzzle.isSolved).toBeTruthy();
+		expect(porteLab.alarme.isActive).toBeTruthy();
+
+		expect(porteLab.pass()).toBeFalsy();//franchissement impossible car alarme active et serrure non déverrouiller
+	});
+	it("uniquement l’alarme désactivée", () =>{
+		const porteLab = new Porte("cle-labo");
+		const puzzleLab = new Puzzle(7);
+		const alarmeLab = new Alarme();//code par default "alarm-code"
+
+		porteLab.addPuzzle(puzzleLab);
+		porteLab.setAlarme(alarmeLab);
+		alarmeLab.setOn();
+
+		const j1 = new Joueur();
+		j1.addToInventory("alarm-code");
+
+		j1.alarmeOff(alarmeLab);
+
+		expect(porteLab.isOpen).toBeFalsy();
+		expect(porteLab.puzzle.isSolved).toBeFalsy();
+		expect(porteLab.alarme.isActive).toBeFalsy();
+
+		expect(porteLab.pass()).toBeFalsy();//franchissement impossible car puzzle non resolus et serrure non déverrouiller
+		
+	});
+	it("clé + énigme ", () =>{
+		const porteLab = new Porte("cle-labo");
+		const puzzleLab = new Puzzle(7);
+		const alarmeLab = new Alarme();//code par default "alarm-code"
+
+		porteLab.addPuzzle(puzzleLab);
+		porteLab.setAlarme(alarmeLab);
+		alarmeLab.setOn();
+
+		const j1 = new Joueur();
+		j1.addToInventory("cle-labo");
+		j1.openDoor(porteLab);//"ouverte" mais non franchie
+		j1.resolve(puzzleLab, 7);
+
+		expect(porteLab.isOpen).toBeTruthy();
+		expect(porteLab.puzzle.isSolved).toBeTruthy();
+		expect(porteLab.alarme.isActive).toBeTruthy();
+
+		expect(porteLab.pass()).toBeFalsy();//franchissement impossible car alarme active 
+		
+	});
+	it("clé + alarme désactivée", () =>{
+		const porteLab = new Porte("cle-labo");
+		const puzzleLab = new Puzzle(7);
+		const alarmeLab = new Alarme();//code par default "alarm-code"
+
+		porteLab.addPuzzle(puzzleLab);
+		porteLab.setAlarme(alarmeLab);
+		alarmeLab.setOn();
+
+		const j1 = new Joueur();
+		j1.addToInventory("cle-labo");
+		j1.addToInventory("alarm-code");
+		j1.openDoor(porteLab);//"ouverte" mais non franchie
+		j1.alarmeOff(alarmeLab);
+
+		expect(porteLab.isOpen).toBeTruthy();
+		expect(porteLab.puzzle.isSolved).toBeFalsy();
+		expect(porteLab.alarme.isActive).toBeFalsy();
+
+		expect(porteLab.pass()).toBeFalsy();//franchissement impossible car puzzle non resolus 
+		
+	});
+	it("énigme + alarme désactivée", () =>{
+		const porteLab = new Porte("cle-labo");
+		const puzzleLab = new Puzzle(7);
+		const alarmeLab = new Alarme();//code par default "alarm-code"
+
+		porteLab.addPuzzle(puzzleLab);
+		porteLab.setAlarme(alarmeLab);
+		alarmeLab.setOn();
+
+		const j1 = new Joueur();
+		j1.addToInventory("alarm-code");
+		j1.openDoor(porteLab);
+		j1.alarmeOff(alarmeLab);
+		j1.resolve(puzzleLab, 7);
+
+		expect(porteLab.isOpen).toBeFalsy();
+		expect(porteLab.puzzle.isSolved).toBeTruthy();
+		expect(porteLab.alarme.isActive).toBeFalsy();
+
+		expect(porteLab.pass()).toBeFalsy();//franchissement impossible car pas la clé
+		
+	});
+	it("les trois conditions réunies", () =>{
+		const porteLab = new Porte("cle-labo");
+		const puzzleLab = new Puzzle(7);
+		const alarmeLab = new Alarme();//code par default "alarm-code"
+
+		porteLab.addPuzzle(puzzleLab);
+		porteLab.setAlarme(alarmeLab);
+		alarmeLab.setOn();
+
+		const j1 = new Joueur();
+		j1.addToInventory("cle-labo");
+		j1.addToInventory("alarm-code");
+		j1.openDoor(porteLab);//"ouverte" mais non franchie
+		j1.alarmeOff(alarmeLab);
+		j1.resolve(puzzleLab, 7);
+
+		expect(porteLab.isOpen).toBeTruthy();
+		expect(porteLab.puzzle.isSolved).toBeTruthy();
+		expect(porteLab.alarme.isActive).toBeFalsy();
+
+		expect(porteLab.pass()).toBeTruthy();
+	});
 })
