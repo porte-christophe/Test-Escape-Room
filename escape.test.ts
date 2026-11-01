@@ -63,16 +63,16 @@ describe("Joueur", () =>{
 
 describe("Salle", () =>{
 	it("Lorsqu'un joueur ramasse un objet, celui-ci est ajouté à son inventaire et retiré de la salle", () =>{
-		const salle = new Salle();
+		const salle = new Salle(["torch","chest"]);
 		const j1 = new Joueur();
-		j1.takeItem(salle, "torch");
+		j1.takeItem(salle,"torch");
 
 
 		expect(j1.inventory).toStrictEqual(["torch"]);
 		expect(salle.items).toStrictEqual(["chest"]);
 	});
 	it("Un objet déjà ramassé ne peut pas être ramassé une seconde fois.", () =>{
-		const salle = new Salle();
+		const salle = new Salle(["chest","torch"]);
 		const j1 = new Joueur();
 		j1.takeItem(salle, "torch");
 
@@ -101,9 +101,11 @@ describe("Enigme", () =>{
 	it("Pour franchir la porte, l’énigme doit avoir été résolue.", () =>{
 		const puzzle = new Puzzle(8);
 		const porte = new Porte();
-		porte.openDoor();
+		const j1 = new Joueur();
 		porte.addPuzzle(puzzle);
-		puzzle.resolve(8);
+
+		j1.resolve(porte, 8);
+		j1.openDoor(porte);//le joueur ouvre la porte qui est deverouiller
 
 		expect(porte.puzzle.isSolved).toBeTruthy();
 		expect(porte.pass()).toBeTruthy();
@@ -112,29 +114,25 @@ describe("Enigme", () =>{
 		const puzzle = new Puzzle(8);
 		const porte = new Porte();
 		const j1 = new Joueur();
-		porte.openDoor();
 		porte.addPuzzle(puzzle);
 
-		expect(j1.resolve(porte.puzzle, 8)).toBeTruthy();
+		expect(j1.resolve(porte, 8)).toBeTruthy();
 	});
 	it("Une mauvaise réponse ne permet pas de résoudre l’énigme.", () =>{
 		const puzzle = new Puzzle(8);
 		const porte = new Porte();
 		const j1 = new Joueur();
-		porte.openDoor();
 		porte.addPuzzle(puzzle);
 
-		expect(j1.resolve(porte.puzzle, 7)).toBeFalsy();
-		expect(porte.pass()).toBeFalsy();
+		expect(j1.resolve(porte, 7)).toBeFalsy();
 	});
 	it("Une fois résolue, l’énigme reste résolue.", () =>{
 		const puzzle = new Puzzle(8);
 		const porte = new Porte();
 		const j1 = new Joueur();
-		porte.openDoor();
 		porte.addPuzzle(puzzle);
 
-		expect(j1.resolve(porte.puzzle, 8)).toBeTruthy();
+		expect(j1.resolve(porte, 8)).toBeTruthy();
 		expect(porte.puzzle.isSolved).toBeTruthy();
 	});
 	it("Chaque mauvaise réponse augmente le nombre de tentatives échouées.", () =>{
@@ -146,13 +144,20 @@ describe("Enigme", () =>{
 	});
 	it("Après 3 mauvaises réponses, une conséquence doit être déclenchée.", () =>{
 		const puzzle = new Puzzle(8);
+		const porte = new Porte();
+		const alert = new Alarme();
 
-		puzzle.resolve(1);
-		puzzle.resolve(1);
+		porte.addPuzzle(puzzle);
+		porte.setAlarme(alert);
+
+		porte.resolvePuzzle(1);
+		porte.resolvePuzzle(1);
 		expect(puzzle.tryStat).toBeTruthy();
-		puzzle.resolve(1);
+		porte.resolvePuzzle(1);
+
 
 		expect(puzzle.tryStat).toBeFalsy();
+		expect(porte.alarme.isActive).toBeTruthy();
 
 	});
 	it("Une bonne réponse permet toujours de résoudre l’énigme.", () =>{
@@ -171,7 +176,7 @@ describe("Enigme", () =>{
 });
 
 describe("Alarme", () =>{
-	it("L’alarme peut être inactive ou active.", () =>{
+	it("L’alarme peut être inactive.", () =>{
 		const alert = new Alarme();
 
 		expect(alert.isActive).toBeFalsy();
@@ -190,6 +195,9 @@ describe("Alarme", () =>{
 
 		expect(alert.isActive).toBeTruthy();
 		expect(alert.isActive).toBeTruthy();
+		alert.setOff();
+		expect(alert.isActive).toBeFalsy();
+
 	});
 	it("Certaines portes ne peuvent pas être franchies lorsque l’alarme est active.", () =>{
 		const alert = new Alarme();
@@ -205,10 +213,12 @@ describe("Alarme", () =>{
 	it("Un joueur peut desactiver une alarme avec un code adapter et le code et retiré de l'inventaire.", () =>{
 		const alert = new Alarme();
 		const j1 = new Joueur();
+		const porte = new Porte();
 		j1.addToInventory("alarm-code");//code de l'alarme par default
 
-		alert.setOn();
-		j1.alarmeOff(alert);
+		porte.setAlarme(alert);
+		porte.setAlarmeOn();
+		j1.alarmeOff(porte);
 
 		expect(j1.inventory).toStrictEqual([]);
 		expect(alert.isActive).toBeFalsy();
@@ -216,10 +226,12 @@ describe("Alarme", () =>{
 	it("Un mauvais code ne désactive pas l’alarme.", () =>{
 		const alert = new Alarme();
 		const j1 = new Joueur();
+		const porte = new Porte();
 		j1.addToInventory("alarme-code");//code erronné
 
-		alert.setOn();
-		j1.alarmeOff(alert);
+		porte.setAlarme(alert);
+		porte.setAlarmeOn();
+		j1.alarmeOff(porte);
 
 		expect(j1.inventory).toStrictEqual(["alarme-code"]);
 		expect(alert.isActive).toBeTruthy();
@@ -227,15 +239,19 @@ describe("Alarme", () =>{
 	it("Une fois l’alarme désactivée, les portes bloquées par l’alarme peuvent à nouveau être franchies.", () =>{
 		const alert = new Alarme();
 		const porte = new Porte();
-		porte.openDoor();
 		const j1 = new Joueur();
 		j1.addToInventory("alarm-code");//code de l'alarme par default
 
 		porte.setAlarme(alert);
-		alert.setOn();
+		porte.setAlarmeOn();
 
+		j1.openDoor(porte);
 		expect(porte.pass()).toBeFalsy();
-		j1.alarmeOff(alert);
+
+
+		j1.alarmeOff(porte);
+		j1.openDoor(porte);
+
 		expect(porte.pass()).toBeTruthy();
 	});
 });
@@ -248,7 +264,7 @@ describe("Porte du labo", () =>{
 
 		porteLab.addPuzzle(puzzleLab);
 		porteLab.setAlarme(alarmeLab);
-		alarmeLab.setOn();
+		porteLab.setAlarmeOn();
 
 
 		expect(porteLab.isOpen).toBeFalsy();
@@ -266,14 +282,14 @@ describe("Porte du labo", () =>{
 
 		porteLab.addPuzzle(puzzleLab);
 		porteLab.setAlarme(alarmeLab);
-		alarmeLab.setOn();
+		porteLab.setAlarmeOn();
 
 		const j1 = new Joueur();
 		j1.addToInventory("cle-labo");
 		j1.openDoor(porteLab);//"ouverte" mais non franchie
 
 
-		expect(porteLab.isOpen).toBeTruthy();
+		expect(porteLab.isOpen).toBeFalsy();
 		expect(porteLab.puzzle.isSolved).toBeFalsy();
 		expect(porteLab.alarme.isActive).toBeTruthy();
 
@@ -286,10 +302,10 @@ describe("Porte du labo", () =>{
 
 		porteLab.addPuzzle(puzzleLab);
 		porteLab.setAlarme(alarmeLab);
-		alarmeLab.setOn();
+		porteLab.setAlarmeOn();
 
 		const j1 = new Joueur();
-		j1.resolve(puzzleLab, 7);
+		j1.resolve(porteLab, 7);
 
 		expect(porteLab.isOpen).toBeFalsy();
 		expect(porteLab.puzzle.isSolved).toBeTruthy();
@@ -304,12 +320,12 @@ describe("Porte du labo", () =>{
 
 		porteLab.addPuzzle(puzzleLab);
 		porteLab.setAlarme(alarmeLab);
-		alarmeLab.setOn();
+		porteLab.setAlarmeOn();
 
 		const j1 = new Joueur();
 		j1.addToInventory("alarm-code");
 
-		j1.alarmeOff(alarmeLab);
+		j1.alarmeOff(porteLab);
 
 		expect(porteLab.isOpen).toBeFalsy();
 		expect(porteLab.puzzle.isSolved).toBeFalsy();
@@ -325,14 +341,14 @@ describe("Porte du labo", () =>{
 
 		porteLab.addPuzzle(puzzleLab);
 		porteLab.setAlarme(alarmeLab);
-		alarmeLab.setOn();
+		porteLab.setAlarmeOn();
 
 		const j1 = new Joueur();
 		j1.addToInventory("cle-labo");
-		j1.openDoor(porteLab);//"ouverte" mais non franchie
-		j1.resolve(puzzleLab, 7);
+		j1.openDoor(porteLab);//ouverture ko car alarme on
+		j1.resolve(porteLab, 7);
 
-		expect(porteLab.isOpen).toBeTruthy();
+		expect(porteLab.isOpen).toBeFalsy();
 		expect(porteLab.puzzle.isSolved).toBeTruthy();
 		expect(porteLab.alarme.isActive).toBeTruthy();
 
@@ -346,13 +362,13 @@ describe("Porte du labo", () =>{
 
 		porteLab.addPuzzle(puzzleLab);
 		porteLab.setAlarme(alarmeLab);
-		alarmeLab.setOn();
+		porteLab.setAlarmeOn();
 
 		const j1 = new Joueur();
 		j1.addToInventory("cle-labo");
 		j1.addToInventory("alarm-code");
+		j1.alarmeOff(porteLab);
 		j1.openDoor(porteLab);//"ouverte" mais non franchie
-		j1.alarmeOff(alarmeLab);
 
 		expect(porteLab.isOpen).toBeTruthy();
 		expect(porteLab.puzzle.isSolved).toBeFalsy();
@@ -368,13 +384,13 @@ describe("Porte du labo", () =>{
 
 		porteLab.addPuzzle(puzzleLab);
 		porteLab.setAlarme(alarmeLab);
-		alarmeLab.setOn();
+		porteLab.setAlarmeOn();
 
 		const j1 = new Joueur();
 		j1.addToInventory("alarm-code");
 		j1.openDoor(porteLab);
-		j1.alarmeOff(alarmeLab);
-		j1.resolve(puzzleLab, 7);
+		j1.alarmeOff(porteLab);
+		j1.resolve(porteLab, 7);
 
 		expect(porteLab.isOpen).toBeFalsy();
 		expect(porteLab.puzzle.isSolved).toBeTruthy();
@@ -390,14 +406,14 @@ describe("Porte du labo", () =>{
 
 		porteLab.addPuzzle(puzzleLab);
 		porteLab.setAlarme(alarmeLab);
-		alarmeLab.setOn();
+		porteLab.setAlarmeOn();
 
 		const j1 = new Joueur();
 		j1.addToInventory("cle-labo");
 		j1.addToInventory("alarm-code");
+		j1.alarmeOff(porteLab);
+		j1.resolve(porteLab, 7);
 		j1.openDoor(porteLab);//"ouverte" mais non franchie
-		j1.alarmeOff(alarmeLab);
-		j1.resolve(puzzleLab, 7);
 
 		expect(porteLab.isOpen).toBeTruthy();
 		expect(porteLab.puzzle.isSolved).toBeTruthy();

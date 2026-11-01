@@ -21,17 +21,17 @@ export class Joueur{
 		let idItemToRemove = -1;
 		this.inventory.forEach((item, index)=>{
 			if (item === porte.clef) {
+				this.removeFromInventory(index);
 				idItemToRemove = index;
 			}
 
 		})
-		if (idItemToRemove === -1) {
-			return false;
+		if (porte.clef === "" || idItemToRemove !== -1) {
+			
+			porte.openDoor();
+			return true;
 		}
-
-		this.removeFromInventory(idItemToRemove);
-		porte.openDoor();
-		return true;
+		return false;		
 	}
 
 	takeItem(salle:Salle, item:string):boolean{
@@ -50,14 +50,14 @@ export class Joueur{
 		return true;
 	}
 
-	resolve(puzzle:Puzzle, res:number):boolean {
-		return puzzle.resolve(res);
+	resolve(porte:Porte, res:number):boolean {
+		return porte.resolvePuzzle(res);
 	}
 
-	alarmeOff(alarme:Alarme):boolean {
+	alarmeOff(porte:Porte):boolean {
 		let idItemToRemove = -1;
 		this.inventory.forEach((item, index)=>{
-			if (item === alarme.code) {
+			if (item === porte.alarme.code) {
 				idItemToRemove = index;
 			}
 
@@ -65,7 +65,7 @@ export class Joueur{
 		if (idItemToRemove === -1) {
 			return false;
 		}
-		alarme.setOff();
+		porte.setAlarmeOff();
 		this.removeFromInventory(idItemToRemove);
 		return true
 	}
